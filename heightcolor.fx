@@ -21,15 +21,6 @@ float SumOfRadialSineWaves(float x, float z)
 	return sum;
 }
 
-float SumOfDirectionalSineWaves(float x, float z)
-{
-	float d = x + z;
-	float sum = 0.0f;
-	for (int i = 0; i < 2; ++i)
-		sum += a[i] * sin(k[i] * d - gTime * w[i] + p[i]);
-	return sum;
-}
-
 float4 GetColorFromHeight(float y)
 {
 	if (abs(y) <= 0.2f)
@@ -47,7 +38,7 @@ float4 GetColorFromHeight(float y)
 OutputVS ColorVS(float3 posL : POSITION0)
 {
 	OutputVS outVS = (OutputVS)0;
-	posL.y = SumOfDirectionalSineWaves(posL.x, posL.z);
+	posL.y = SumOfRadialSineWaves(posL.x, posL.z);
 	outVS.color = GetColorFromHeight(posL.y);
 	outVS.posH = mul(float4(posL, 1.0f), gWVP);
 	
