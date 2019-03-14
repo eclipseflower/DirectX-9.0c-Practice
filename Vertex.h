@@ -25,3 +25,14 @@ struct VertexCol
 	D3DCOLOR col;
 	static IDirect3DVertexDeclaration9 *decl;
 };
+
+struct VertexPN
+{
+	VertexPN() : pos(0.0f, 0.0f, 0.0f), normal(0.0f, 0.0f, 0.0f) {}
+	VertexPN(float x, float y, float z, float nx, float ny, float nz) : pos(x, y, z), normal(nx, ny, nz) {}
+	VertexPN(const D3DXVECTOR3 &v, const D3DXVECTOR3 &n) : pos(v), normal(n) {}
+
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 normal;
+	static IDirect3DVertexDeclaration9 *decl;
+};

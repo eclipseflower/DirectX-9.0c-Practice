@@ -20,6 +20,23 @@ extern IDirect3DDevice9* gD3dDevice;
 void GenTriGrid(int numVertRows, int numVertCols, float dx, float dz, const D3DXVECTOR3& center,
 	std::vector<D3DXVECTOR3>& verts, std::vector<DWORD>& indices);
 
+const D3DXCOLOR _WHITE(1.0f, 1.0f, 1.0f, 1.0f);
+const D3DXCOLOR _BLACK(0.0f, 0.0f, 0.0f, 1.0f);
+const D3DXCOLOR _RED(1.0f, 0.0f, 0.0f, 1.0f);
+const D3DXCOLOR _GREEN(0.0f, 1.0f, 0.0f, 1.0f);
+const D3DXCOLOR _BLUE(0.0f, 0.0f, 1.0f, 1.0f);
+
+struct Mtrl
+{
+	Mtrl() : ambient(_WHITE), diffuse(_WHITE), spec(_WHITE), specPower(8.0f) {}
+	Mtrl(const D3DXCOLOR& a, const D3DXCOLOR& d, const D3DXCOLOR& s, float power) : ambient(a), diffuse(d), spec(s), specPower(power) {}
+
+	D3DXCOLOR ambient;
+	D3DXCOLOR diffuse;
+	D3DXCOLOR spec;
+	float specPower;
+};
+
 #define ReleaseCOM(x) { if(x){ x->Release();x = 0; } }
 
 #if defined(DEBUG) | defined(_DEBUG)
