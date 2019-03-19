@@ -127,11 +127,11 @@ int D3DApp::Run()
 	msg.message = WM_NULL;
 
 	__int64 cntsPerSec = 0;
-	QueryPerformanceCounter((LARGE_INTEGER *)&cntsPerSec);
+	QueryPerformanceFrequency((LARGE_INTEGER *)&cntsPerSec);
 	float secsPerCnt = 1.0f / (float)cntsPerSec;
 
 	__int64 prevTimeStamp = 0;
-	QueryPerformanceFrequency((LARGE_INTEGER *)&prevTimeStamp);
+	QueryPerformanceCounter((LARGE_INTEGER *)&prevTimeStamp);
 
 	while (msg.message != WM_QUIT)
 	{
