@@ -5,6 +5,7 @@ IDirect3DVertexDeclaration9 *VertexPos::decl = NULL;
 IDirect3DVertexDeclaration9 *VertexCol::decl = NULL;
 IDirect3DVertexDeclaration9 *VertexPN::decl = NULL;
 IDirect3DVertexDeclaration9 *VertexPNT::decl = NULL;
+IDirect3DVertexDeclaration9 *VertexPT::decl = NULL;
 
 void InitAllVertexDeclarations()
 {
@@ -39,6 +40,14 @@ void InitAllVertexDeclarations()
 		D3DDECL_END()
 	};
 	HR(gD3dDevice->CreateVertexDeclaration(vertexPNTElements, &VertexPNT::decl));
+
+	D3DVERTEXELEMENT9 vertexPTElements[] =
+	{
+		{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+		D3DDECL_END()
+	};
+	HR(gD3dDevice->CreateVertexDeclaration(vertexPTElements, &VertexPT::decl));
 }
 
 void DestroyAllVertexDeclarations()
@@ -47,4 +56,5 @@ void DestroyAllVertexDeclarations()
 	ReleaseCOM(VertexCol::decl);
 	ReleaseCOM(VertexPN::decl);
 	ReleaseCOM(VertexPNT::decl);
+	ReleaseCOM(VertexPT::decl);
 }
