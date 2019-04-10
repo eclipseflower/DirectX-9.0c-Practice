@@ -61,9 +61,9 @@ OutputVS DirLightTexVS(float3 posL : POSITION0, float3 normalL : NORMAL0, float2
 
 float4 DirLightTexPS(float4 c : COLOR0, float4 spec : COLOR1, float2 tex0 : TEXCOORD0) : COLOR
 {
-	float3 texColor = tex2D(TexS, tex0).rgb;
-	float3 diffuse = c.rgb * texColor;
-	return float4(diffuse + spec.rgb, c.a);
+	float4 texColor = tex2D(TexS, tex0);
+	float3 diffuse = c.rgb * texColor.rgb;
+	return float4(diffuse + spec.rgb, texColor.a * c.a);
 }
 
 technique DirLightTexTech

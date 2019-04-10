@@ -38,7 +38,7 @@ TeapotDemoApp::TeapotDemoApp(HINSTANCE hInstance, std::string winCaption, D3DDEV
 	D3DXMatrixIdentity(&mTeapotWorld);
 
 	HR(D3DXCreateTextureFromFile(gD3dDevice, "crate.jpg", &mCrateTex));
-	HR(D3DXCreateTextureFromFile(gD3dDevice, "brick1.dds", &mTeapotTex));
+	HR(D3DXCreateTextureFromFile(gD3dDevice, "bricka.dds", &mTeapotTex));
 
 	HR(D3DXCreateTeapot(gD3dDevice, &mTeapot, 0));
 	GenSphericalTexCoords();
