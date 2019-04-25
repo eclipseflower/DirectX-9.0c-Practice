@@ -14,11 +14,15 @@
 #include <vector>
 
 class D3DApp;
+struct Mtrl;
 extern D3DApp* gD3dApp;
 extern IDirect3DDevice9* gD3dDevice;
 
 void GenTriGrid(int numVertRows, int numVertCols, float dx, float dz, const D3DXVECTOR3& center,
 	std::vector<D3DXVECTOR3>& verts, std::vector<DWORD>& indices);
+
+void LoadXFile(const std::string& filename, ID3DXMesh** meshOut, std::vector<Mtrl>& mtrls, 
+	std::vector<IDirect3DTexture9*>& texs);
 
 const D3DXCOLOR _WHITE(1.0f, 1.0f, 1.0f, 1.0f);
 const D3DXCOLOR _BLACK(0.0f, 0.0f, 0.0f, 1.0f);
@@ -35,6 +39,14 @@ struct Mtrl
 	D3DXCOLOR diffuse;
 	D3DXCOLOR spec;
 	float specPower;
+};
+
+struct DirLight
+{
+	D3DXCOLOR ambient;
+	D3DXCOLOR diffuse;
+	D3DXCOLOR spec;
+	D3DXVECTOR3 dirW;
 };
 
 #define ReleaseCOM(x) { if(x){ x->Release();x = 0; } }
