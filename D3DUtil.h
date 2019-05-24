@@ -30,6 +30,8 @@ const D3DXCOLOR _RED(1.0f, 0.0f, 0.0f, 1.0f);
 const D3DXCOLOR _GREEN(0.0f, 1.0f, 0.0f, 1.0f);
 const D3DXCOLOR _BLUE(0.0f, 0.0f, 1.0f, 1.0f);
 
+const float EPSILON = 0.001f;
+
 struct Mtrl
 {
 	Mtrl() : ambient(_WHITE), diffuse(_WHITE), spec(_WHITE), specPower(8.0f) {}
