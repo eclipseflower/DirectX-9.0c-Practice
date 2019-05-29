@@ -17,6 +17,8 @@ class D3DApp;
 struct Mtrl;
 extern D3DApp* gD3dApp;
 extern IDirect3DDevice9* gD3dDevice;
+class Camera;
+extern Camera* gCamera;
 
 void GenTriGrid(int numVertRows, int numVertCols, float dx, float dz, const D3DXVECTOR3& center,
 	std::vector<D3DXVECTOR3>& verts, std::vector<DWORD>& indices);
@@ -49,6 +51,22 @@ struct DirLight
 	D3DXCOLOR diffuse;
 	D3DXCOLOR spec;
 	D3DXVECTOR3 dirW;
+};
+
+struct AABB
+{
+	// Initialize to an infinitely small bounding box.
+	AABB()
+		: minPt(INFINITY, INFINITY, INFINITY),
+		maxPt(-INFINITY, -INFINITY, -INFINITY) {}
+
+	D3DXVECTOR3 center()
+	{
+		return 0.5f*(minPt + maxPt);
+	}
+
+	D3DXVECTOR3 minPt;
+	D3DXVECTOR3 maxPt;
 };
 
 #define ReleaseCOM(x) { if(x){ x->Release();x = 0; } }
