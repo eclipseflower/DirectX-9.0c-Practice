@@ -34,11 +34,21 @@ private:
 	void BuildSubGridMesh(RECT& R, VertexPNT* gridVerts);
 	void BuildEffect();
 
+	struct SubGrid
+	{
+		ID3DXMesh *mesh;
+		AABB box;
+		bool operator < ( SubGrid& rhs);
+
+		const static int NUM_ROWS = 33;
+		const static int NUM_COLS = 33;
+		const static int NUM_TRIS = (NUM_ROWS - 1)*(NUM_COLS - 1) * 2;
+		const static int NUM_VERTS = NUM_ROWS * NUM_COLS;
+	};
+
 private:
 	Heightmap mHeightmap;
-
-	std::vector<ID3DXMesh*> mSubGridMeshes;
-	std::vector<AABB> mSubGridBndBoxes;
+	std::vector<SubGrid> mSubGrids;
 
 	DWORD mVertRows;
 	DWORD mVertCols;

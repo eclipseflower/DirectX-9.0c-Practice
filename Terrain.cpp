@@ -1,5 +1,6 @@
 #include "Terrain.h"
 #include "Camera.h"
+#include <list>
 
 struct SubGrid
 {
@@ -33,8 +34,8 @@ Terrain::Terrain(UINT vertRows, UINT vertCols, float dx, float dz, std::string h
 
 Terrain::~Terrain()
 {
-	for (UINT i = 0; i < mSubGridMeshes.size(); ++i)
-		ReleaseCOM(mSubGridMeshes[i]);
+	for (UINT i = 0; i < mSubGrids.size(); ++i)
+		ReleaseCOM(mSubGrids[i].mesh);
 
 	ReleaseCOM(mFX);
 	ReleaseCOM(mTex0);
@@ -45,12 +46,12 @@ Terrain::~Terrain()
 
 DWORD Terrain::GetNumTriangles()
 {
-	return (DWORD)mSubGridMeshes.size()*mSubGridMeshes[0]->GetNumFaces();
+	return (DWORD)mSubGrids.size()*mSubGrids[0].mesh->GetNumFaces();
 }
 
 DWORD Terrain::GetNumVertices()
 {
-	return (DWORD)mSubGridMeshes.size()*mSubGridMeshes[0]->GetNumVertices();
+	return (DWORD)mSubGrids.size()*mSubGrids[0].mesh->GetNumVertices();
 }
 
 float Terrain::GetWidth()
@@ -118,14 +119,25 @@ void Terrain::SetDirToSunW(const D3DXVECTOR3 & d)
 
 void Terrain::Draw()
 {
+	// Frustum cull sub-grids.
+	std::list<SubGrid> visibleSubGrids;
+	for (UINT i = 0; i < mSubGrids.size(); ++i)
+	{
+		if (gCamera->IsVisible(mSubGrids[i].box))
+			visibleSubGrids.push_back(mSubGrids[i]);
+	}
+
+	// Sort front-to-back from camera.
+	visibleSubGrids.sort();
+
 	HR(mFX->SetMatrix(mhViewProj, &gCamera->ViewProj()));
 	HR(mFX->SetTechnique(mhTech));
 	UINT numPasses = 0;
 	HR(mFX->Begin(&numPasses, 0));
 	HR(mFX->BeginPass(0));
 
-	for (UINT i = 0; i < mSubGridMeshes.size(); ++i)
-		HR(mSubGridMeshes[i]->DrawSubset(0));
+	for (std::list<SubGrid>::iterator iter = visibleSubGrids.begin(); iter != visibleSubGrids.end(); ++iter)
+		HR(iter->mesh->DrawSubset(0));
 
 	HR(mFX->EndPass());
 	HR(mFX->End());
@@ -285,8 +297,10 @@ void Terrain::BuildSubGridMesh(RECT & R, VertexPNT * gridVerts)
 
 	//===============================================================
 	// Save the mesh and bounding box.
-	mSubGridMeshes.push_back(subMesh);
-	mSubGridBndBoxes.push_back(bndBox);
+	SubGrid g;
+	g.mesh = subMesh;
+	g.box = bndBox;
+	mSubGrids.push_back(g);
 }
 
 void Terrain::BuildEffect()
@@ -309,4 +323,11 @@ void Terrain::BuildEffect()
 	HR(mFX->SetTexture(mhTex1, mTex1));
 	HR(mFX->SetTexture(mhTex2, mTex2));
 	HR(mFX->SetTexture(mhBlendMap, mBlendMap));
+}
+
+bool Terrain::SubGrid::operator<( SubGrid & rhs) 
+{
+	D3DXVECTOR3 d1 = box.center() - gCamera->Pos();
+	D3DXVECTOR3 d2 = rhs.box.center() - gCamera->Pos();
+	return D3DXVec3LengthSq(&d1) < D3DXVec3LengthSq(&d2);
 }

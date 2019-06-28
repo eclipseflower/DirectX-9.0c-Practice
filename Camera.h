@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3dx9.h>
+#include "D3DUtil.h"
 
 class Terrain;
 
@@ -25,8 +26,12 @@ public:
 
 	void Update(float dt, Terrain* terrain, float offsetHeight);
 
+	// Box coordinates should be relative to world space.
+	bool IsVisible(const AABB& box) const;
+
 protected:
 	void BuildView();
+	void BuildWorldFrustumPlanes();
 
 protected:
 	D3DXMATRIX mView;
@@ -40,4 +45,12 @@ protected:
 	D3DXVECTOR3 mLookW;
 
 	float mSpeed;
+
+	// Frustum Planes
+	D3DXPLANE mFrustumPlanes[6]; // [0] = near
+								 // [1] = far
+								 // [2] = left
+								 // [3] = right
+								 // [4] = top
+								 // [5] = bottom
 };
