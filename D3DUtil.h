@@ -34,6 +34,8 @@ const D3DXCOLOR _BLUE(0.0f, 0.0f, 1.0f, 1.0f);
 
 const float EPSILON = 0.001f;
 
+float GetRandomFloat(float a, float b);
+
 struct Mtrl
 {
 	Mtrl() : ambient(_WHITE), diffuse(_WHITE), spec(_WHITE), specPower(8.0f) {}
@@ -60,9 +62,36 @@ struct AABB
 		: minPt(INFINITY, INFINITY, INFINITY),
 		maxPt(-INFINITY, -INFINITY, -INFINITY) {}
 
-	D3DXVECTOR3 center()
+	D3DXVECTOR3 Center()const
 	{
-		return 0.5f*(minPt + maxPt);
+		return (minPt + maxPt)*0.5f;
+	}
+
+	D3DXVECTOR3 Extent()const
+	{
+		return (maxPt - minPt)*0.5f;
+	}
+
+	void Xform(const D3DXMATRIX& M, AABB& out)
+	{
+		// Convert to center/extent representation.
+		D3DXVECTOR3 c = Center();
+		D3DXVECTOR3 e = Extent();
+
+		// Transform center in usual way.
+		D3DXVec3TransformCoord(&c, &c, &M);
+
+		// Transform extent.
+		D3DXMATRIX absM;
+		D3DXMatrixIdentity(&absM);
+		absM(0, 0) = fabsf(M(0, 0)); absM(0, 1) = fabsf(M(0, 1)); absM(0, 2) = fabsf(M(0, 2));
+		absM(1, 0) = fabsf(M(1, 0)); absM(1, 1) = fabsf(M(1, 1)); absM(1, 2) = fabsf(M(1, 2));
+		absM(2, 0) = fabsf(M(2, 0)); absM(2, 1) = fabsf(M(2, 1)); absM(2, 2) = fabsf(M(2, 2));
+		D3DXVec3TransformNormal(&e, &e, &absM);
+
+		// Convert back to AABB representation.
+		out.minPt = c - e;
+		out.maxPt = c + e;
 	}
 
 	D3DXVECTOR3 minPt;

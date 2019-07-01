@@ -327,7 +327,7 @@ void Terrain::BuildEffect()
 
 bool Terrain::SubGrid::operator<( SubGrid & rhs) 
 {
-	D3DXVECTOR3 d1 = box.center() - gCamera->Pos();
-	D3DXVECTOR3 d2 = rhs.box.center() - gCamera->Pos();
+	D3DXVECTOR3 d1 = box.Center() - gCamera->Pos();
+	D3DXVECTOR3 d2 = rhs.box.Center() - gCamera->Pos();
 	return D3DXVec3LengthSq(&d1) < D3DXVec3LengthSq(&d2);
 }

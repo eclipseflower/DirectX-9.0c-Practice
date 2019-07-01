@@ -59,3 +59,16 @@ struct VertexPT
 	D3DXVECTOR2 tex0;
 	static IDirect3DVertexDeclaration9 *decl;
 };
+
+struct GrassVertex
+{
+	GrassVertex() :pos(0.0f, 0.0f, 0.0f), tex0(0.0f, 0.0f), amplitude(0.0f) {}
+	GrassVertex(const D3DXVECTOR3& v, const D3DXVECTOR2& uv, float amp) : pos(v), tex0(uv), amplitude(amp) {}
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 quadPos;
+	D3DXVECTOR2 tex0;
+	float amplitude; // for wind oscillation.
+	D3DCOLOR colorOffset;
+
+	static IDirect3DVertexDeclaration9* decl;
+};

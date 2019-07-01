@@ -6,6 +6,7 @@ IDirect3DVertexDeclaration9 *VertexCol::decl = NULL;
 IDirect3DVertexDeclaration9 *VertexPN::decl = NULL;
 IDirect3DVertexDeclaration9 *VertexPNT::decl = NULL;
 IDirect3DVertexDeclaration9 *VertexPT::decl = NULL;
+IDirect3DVertexDeclaration9 *GrassVertex::decl = NULL;
 
 void InitAllVertexDeclarations()
 {
@@ -48,6 +49,17 @@ void InitAllVertexDeclarations()
 		D3DDECL_END()
 	};
 	HR(gD3dDevice->CreateVertexDeclaration(vertexPTElements, &VertexPT::decl));
+
+	D3DVERTEXELEMENT9 grassVertexElements[] =
+	{
+		{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+		{0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1},
+		{0, 32, D3DDECLTYPE_FLOAT1, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2},
+		{0, 36, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0},
+		D3DDECL_END()
+	};
+	HR(gD3dDevice->CreateVertexDeclaration(grassVertexElements, &GrassVertex::decl));
 }
 
 void DestroyAllVertexDeclarations()
@@ -57,4 +69,5 @@ void DestroyAllVertexDeclarations()
 	ReleaseCOM(VertexPN::decl);
 	ReleaseCOM(VertexPNT::decl);
 	ReleaseCOM(VertexPT::decl);
+	ReleaseCOM(GrassVertex::decl);
 }
