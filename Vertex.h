@@ -72,3 +72,16 @@ struct GrassVertex
 
 	static IDirect3DVertexDeclaration9* decl;
 };
+
+struct Particle
+{
+	D3DXVECTOR3 initialPos;
+	D3DXVECTOR3 initialVelocity;
+	float       initialSize; // In pixels.
+	float       initialTime;
+	float       lifeTime;
+	float       mass;
+	D3DCOLOR    initialColor;
+
+	static IDirect3DVertexDeclaration9* decl;
+};

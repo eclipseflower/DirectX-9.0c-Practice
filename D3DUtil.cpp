@@ -165,3 +165,13 @@ float GetRandomFloat(float a, float b)
 
 	return (f*(b - a)) + a;
 }
+
+void GetRandomVec(D3DXVECTOR3 & out)
+{
+	out.x = GetRandomFloat(-1.0f, 1.0f);
+	out.y = GetRandomFloat(-1.0f, 1.0f);
+	out.z = GetRandomFloat(-1.0f, 1.0f);
+
+	// Project onto unit sphere.
+	D3DXVec3Normalize(&out, &out);
+}

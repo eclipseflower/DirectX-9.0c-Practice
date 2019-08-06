@@ -35,6 +35,7 @@ const D3DXCOLOR _BLUE(0.0f, 0.0f, 1.0f, 1.0f);
 const float EPSILON = 0.001f;
 
 float GetRandomFloat(float a, float b);
+void GetRandomVec(D3DXVECTOR3& out);
 
 struct Mtrl
 {
