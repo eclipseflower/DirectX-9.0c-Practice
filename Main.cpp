@@ -1,6 +1,6 @@
 #include "DirectInput.h"
 #include "Camera.h"
-#include "SprinklerDemoApp.h"
+#include "GunDemoApp.h"
 #include <ctime>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd)
@@ -14,7 +14,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, in
 	Camera camera;
 	gCamera = &camera;
 
-	SprinklerDemoApp app(hInstance, "Hello Direct3D", D3DDEVTYPE_HAL, D3DCREATE_HARDWARE_VERTEXPROCESSING);
+	GunDemoApp app(hInstance, "Hello Direct3D", D3DDEVTYPE_HAL, D3DCREATE_HARDWARE_VERTEXPROCESSING);
 	gD3dApp = &app;
 
 	DirectInput di(DISCL_NONEXCLUSIVE | DISCL_FOREGROUND, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
