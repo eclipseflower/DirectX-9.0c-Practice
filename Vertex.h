@@ -85,3 +85,14 @@ struct Particle
 
 	static IDirect3DVertexDeclaration9* decl;
 };
+
+struct NMapVertex
+{
+	D3DXVECTOR3 pos;
+	D3DXVECTOR3 tangent;
+	D3DXVECTOR3 binormal;
+	D3DXVECTOR3 normal;
+	D3DXVECTOR2 tex0;
+
+	static IDirect3DVertexDeclaration9* decl;
+};
