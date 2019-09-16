@@ -30,7 +30,7 @@ PropsDemoApp::PropsDemoApp(HINSTANCE hInstance, std::string winCaption, D3DDEVTY
 	// Setup water.
 	D3DXMATRIX waterWorld;
 	D3DXMatrixTranslation(&waterWorld, 8.0f, 35.0f, -80.0f);
-	mWater = new Water(33, 33, 20, 20, waterWorld);
+	//mWater = new Water(33, 33, 20, 20, waterWorld);
 
 	// Initialize camera.
 	gCamera->Pos() = D3DXVECTOR3(8.0f, 35.0f, -100.0f);

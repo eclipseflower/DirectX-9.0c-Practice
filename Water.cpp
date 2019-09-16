@@ -2,22 +2,18 @@
 #include "Vertex.h"
 #include "Camera.h"
 
-Water::Water(int m, int n, float dx, float dz, const D3DXMATRIX & toWorld)
+Water::Water(InitInfo& initInfo)
 {
-	mVertRows = m;
-	mVertCols = n;
+	mInitInfo = initInfo;
 
-	mWidth = (m - 1)*dz;
-	mDepth = (n - 1)*dx;
+	mWidth = (initInfo.vertCols - 1)*initInfo.dx;
+	mDepth = (initInfo.vertRows - 1)*initInfo.dz;
 
-	mDX = dx;
-	mDZ = dz;
+	mWaveMapOffset0 = D3DXVECTOR2(0.0f, 0.0f);
+	mWaveMapOffset1 = D3DXVECTOR2(0.0f, 0.0f);
 
-	mToWorld = toWorld;
-
-
-	DWORD numTris = (m - 1)*(n - 1) * 2;
-	DWORD numVerts = m * n;
+	DWORD numTris = (initInfo.vertRows - 1)*(initInfo.vertCols - 1) * 2;
+	DWORD numVerts = initInfo.vertRows*initInfo.vertCols;
 
 
 	//===============================================================
@@ -26,7 +22,7 @@ Water::Water(int m, int n, float dx, float dz, const D3DXMATRIX & toWorld)
 
 	D3DVERTEXELEMENT9 elems[MAX_FVF_DECL_SIZE];
 	UINT numElems = 0;
-	HR(VertexPos::decl->GetDeclaration(elems, &numElems));
+	HR(VertexPT::decl->GetDeclaration(elems, &numElems));
 	HR(D3DXCreateMesh(numTris, numVerts,
 		D3DXMESH_MANAGED, elems, gD3dDevice, &mMesh));
 
@@ -34,16 +30,24 @@ Water::Water(int m, int n, float dx, float dz, const D3DXMATRIX & toWorld)
 	//===============================================================
 	// Write the grid vertices and triangles to the mesh.
 
-	VertexPos* v = 0;
+	VertexPT* v = 0;
 	HR(mMesh->LockVertexBuffer(0, (void**)&v));
 
 	std::vector<D3DXVECTOR3> verts;
 	std::vector<DWORD> indices;
-	GenTriGrid(m, n, dx, dz, D3DXVECTOR3(0.0f, 0.0f, 0.0f), verts, indices);
+	GenTriGrid(mInitInfo.vertRows, mInitInfo.vertCols, mInitInfo.dx,
+		mInitInfo.dz, D3DXVECTOR3(0.0f, 0.0f, 0.0f), verts, indices);
 
-	for (UINT i = 0; i < mMesh->GetNumVertices(); ++i)
+	for (int i = 0; i < mInitInfo.vertRows; ++i)
 	{
-		v[i].pos = verts[i];
+		for (int j = 0; j < mInitInfo.vertCols; ++j)
+		{
+			DWORD index = i * mInitInfo.vertCols + j;
+			v[index].pos = verts[index];
+			v[index].tex0 = D3DXVECTOR2((float)j / mInitInfo.vertCols,
+				(float)i / mInitInfo.vertRows)
+				* initInfo.texScale;
+		}
 	}
 	HR(mMesh->UnlockVertexBuffer());
 
@@ -76,8 +80,10 @@ Water::Water(int m, int n, float dx, float dz, const D3DXMATRIX & toWorld)
 
 
 	//===============================================================
-	// Build the water effect.
+	// Create textures/effect.
 
+	HR(D3DXCreateTextureFromFile(gD3dDevice, initInfo.waveMapFilename0.c_str(), &mWaveMap0));
+	HR(D3DXCreateTextureFromFile(gD3dDevice, initInfo.waveMapFilename1.c_str(), &mWaveMap1));
 	BuildFX();
 }
 
@@ -85,6 +91,8 @@ Water::~Water()
 {
 	ReleaseCOM(mMesh);
 	ReleaseCOM(mFX);
+	ReleaseCOM(mWaveMap0);
+	ReleaseCOM(mWaveMap1);
 }
 
 DWORD Water::GetNumTriangles()
@@ -109,12 +117,27 @@ void Water::OnResetDevice()
 
 void Water::Update(float dt)
 {
+	mWaveMapOffset0 += mInitInfo.waveMapVelocity0 * dt;
+	mWaveMapOffset1 += mInitInfo.waveMapVelocity1 * dt;
+
+	// Textures repeat every 1.0 unit, so reset back down to zero
+	// so the coordinates do not grow too large.
+	if (mWaveMapOffset0.x >= 1.0f || mWaveMapOffset0.x <= -1.0f)
+		mWaveMapOffset0.x = 0.0f;
+	if (mWaveMapOffset1.x >= 1.0f || mWaveMapOffset1.x <= -1.0f)
+		mWaveMapOffset1.x = 0.0f;
+	if (mWaveMapOffset0.y >= 1.0f || mWaveMapOffset0.y <= -1.0f)
+		mWaveMapOffset0.y = 0.0f;
+	if (mWaveMapOffset1.y >= 1.0f || mWaveMapOffset1.y <= -1.0f)
+		mWaveMapOffset1.y = 0.0f;
 }
 
 void Water::Draw()
 {
-	HR(mFX->SetMatrix(mhWVP, &(mToWorld*gCamera->ViewProj())));
-	HR(mFX->SetValue(mhEyePosW, gCamera->Pos(), sizeof(D3DXVECTOR3)));
+	HR(mFX->SetMatrix(mhWVP, &(mInitInfo.toWorld*gCamera->ViewProj())));
+	HR(mFX->SetValue(mhEyePosW, &gCamera->Pos(), sizeof(D3DXVECTOR3)));
+	HR(mFX->SetValue(mhWaveMapOffset0, &mWaveMapOffset0, sizeof(D3DXVECTOR2)));
+	HR(mFX->SetValue(mhWaveMapOffset1, &mWaveMapOffset1, sizeof(D3DXVECTOR2)));
 
 	UINT numPasses = 0;
 	HR(mFX->Begin(&numPasses, 0));
@@ -135,11 +158,32 @@ void Water::BuildFX()
 		MessageBox(0, (char*)errors->GetBufferPointer(), 0, 0);
 
 	mhTech = mFX->GetTechniqueByName("WaterTech");
-	mhWVP = mFX->GetParameterByName(0, "gWVP");
 	mhWorld = mFX->GetParameterByName(0, "gWorld");
+	mhWorldInv = mFX->GetParameterByName(0, "gWorldInv");
+	mhWVP = mFX->GetParameterByName(0, "gWVP");
 	mhEyePosW = mFX->GetParameterByName(0, "gEyePosW");
+	mhLight = mFX->GetParameterByName(0, "gLight");
+	mhMtrl = mFX->GetParameterByName(0, "gMtrl");
+	mhWaveMap0 = mFX->GetParameterByName(0, "gWaveMap0");
+	mhWaveMap1 = mFX->GetParameterByName(0, "gWaveMap1");
+	mhWaveMapOffset0 = mFX->GetParameterByName(0, "gWaveMapOffset0");
+	mhWaveMapOffset1 = mFX->GetParameterByName(0, "gWaveMapOffset1");
+	mhEnvMap = mFX->GetParameterByName(0, "gEnvMap");
+
 
 	// We don't need to set these every frame since they do not change.
+	HR(mFX->SetMatrix(mhWorld, &mInitInfo.toWorld));
+	D3DXMATRIX worldInv;
+	D3DXMatrixInverse(&worldInv, 0, &mInitInfo.toWorld);
+	HR(mFX->SetMatrix(mhWorldInv, &worldInv));
 	HR(mFX->SetTechnique(mhTech));
-	HR(mFX->SetMatrix(mhWorld, &mToWorld));
+	HR(mFX->SetTexture(mhWaveMap0, mWaveMap0));
+	HR(mFX->SetTexture(mhWaveMap1, mWaveMap1));
+	HR(mFX->SetValue(mhLight, &mInitInfo.dirLight, sizeof(DirLight)));
+	HR(mFX->SetValue(mhMtrl, &mInitInfo.mtrl, sizeof(Mtrl)));
+}
+
+void Water::SetEnvMap(IDirect3DCubeTexture9* envMap)
+{
+	HR(mFX->SetTexture(mhEnvMap, envMap));
 }
