@@ -96,3 +96,12 @@ struct NMapVertex
 
 	static IDirect3DVertexDeclaration9* decl;
 };
+
+struct WaterDMapVertex
+{
+	D3DXVECTOR3 pos;
+	D3DXVECTOR2 scaledTexC;     // [a, b]
+	D3DXVECTOR2 normalizedTexC; // [0, 1]
+
+	static IDirect3DVertexDeclaration9* decl;
+};

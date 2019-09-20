@@ -9,6 +9,7 @@ IDirect3DVertexDeclaration9 *VertexPT::decl = NULL;
 IDirect3DVertexDeclaration9 *GrassVertex::decl = NULL;
 IDirect3DVertexDeclaration9* Particle::decl = NULL;
 IDirect3DVertexDeclaration9* NMapVertex::decl = NULL;
+IDirect3DVertexDeclaration9* WaterDMapVertex::decl = NULL;
 
 void InitAllVertexDeclarations()
 {
@@ -86,6 +87,15 @@ void InitAllVertexDeclarations()
 		D3DDECL_END()
 	};
 	HR(gD3dDevice->CreateVertexDeclaration(NMapVertexElements, &NMapVertex::decl));
+
+	D3DVERTEXELEMENT9 WaterDMapVertexElements[] =
+	{
+		{0, 0,  D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+		{0, 20, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1},
+		D3DDECL_END()
+	};
+	HR(gD3dDevice->CreateVertexDeclaration(WaterDMapVertexElements, &WaterDMapVertex::decl));
 }
 
 void DestroyAllVertexDeclarations()
@@ -98,4 +108,5 @@ void DestroyAllVertexDeclarations()
 	ReleaseCOM(GrassVertex::decl);
 	ReleaseCOM(Particle::decl);
 	ReleaseCOM(NMapVertex::decl);
+	ReleaseCOM(WaterDMapVertex::decl);
 }
